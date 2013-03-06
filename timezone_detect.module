@@ -6,10 +6,10 @@
 
 define('TIMEZONE_DETECT_LIBRARY_WEBSITE', 'http://pellepim.bitbucket.org/jstz/');
 define('TIMEZONE_DETECT_LIBRARY_FILENAME', 'jstz.js');
-define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://raw.github.com/JordanMagnuson/jstimezonedetect/master/jstz.js');
+define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js');
 
 /**
- * Implements hook_menu.
+ * Implements hook_menu().
  */
 function timezone_detect_menu() {
 
@@ -19,7 +19,7 @@ function timezone_detect_menu() {
       'page callback' => 'drupal_get_form',
       'page arguments' => array('timezone_detect_admin_form'),
       'access arguments' => array('administer site configuration'),
-      'description' => 'Allows administrators to adjust settings for timezone detect.',
+      'description' => 'Allows administrators to adjust settings for Timezone Detect.',
       'file' => 'timezone_detect.admin.inc',
   );
 
@@ -39,13 +39,13 @@ function timezone_detect_menu() {
  */
 function timezone_detect_libraries_info() {
   return array(
-    'jstz' => array(
+    'jstimezonedetect' => array(
       'name' => t('jsTimezoneDetect'),
       'vendor url' => TIMEZONE_DETECT_LIBRARY_WEBSITE,
       'download url' => TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL,
       'version arguments' => array(
         'file' => TIMEZONE_DETECT_LIBRARY_FILENAME,
-        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@', // e.g. @version 0.10.0
+        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@', // for example: @version 0.10.0
       ),
       'files' => array(
         'js' => array(
@@ -60,7 +60,8 @@ function timezone_detect_libraries_info() {
  * Implements hook_user_login().
  */
 function timezone_detect_user_login(&$edit, $account) {
-  if (variable_get('timezone_detect_update_timezone_every_login', 0) || empty($account->timezone)) {
+  $update_timezone_every_login = variable_get('timezone_detect_update_timezone_every_login', 0);
+  if ($update_timezone_every_login || empty($account->timezone)) {
     // Set session flag to update user's timezone. Note that we cannot add the js directly, as the user will be redirected after this hook fires
     // See http://stackoverflow.com/questions/13458609/drupal-add-js-not-working-in-hook-user-login
     $_SESSION['timezone_detect']['update_timezone'] = TRUE;
@@ -68,12 +69,12 @@ function timezone_detect_user_login(&$edit, $account) {
 }
 
 /**
- * Implements hook_user_login().
+ * Implements hook_page_alter().
  */
 function timezone_detect_page_alter(&$page) {
   // Update user's timezone if session flag is set
   if (isset($_SESSION['timezone_detect']['update_timezone'])) {
-    // Add the javascript which will update the user's timezone via ajax callback
+    // Add the javascript that will update the user's timezone via ajax callback
     timezone_detect_add_js();
   }
 }
@@ -84,21 +85,34 @@ function timezone_detect_page_alter(&$page) {
  */
 function timezone_detect_set_timezone() {
   global $user;
+
+  // Check for $_POST data
   if (!isset($_POST['timezone'])) {
     watchdog('timezone_detect', 'Attempting to set timezone for user @uid, but no timezone found in $_POST data; aborting.', array('@uid' => $user->uid), WATCHDOG_ERROR);
-    drupal_goto('<front>');
+    drupal_set_message(t('An error has occured while attempting to set your timezone.'), 'error');
+    return '';
   }
-  $timezone = $_POST['timezone'];
+  $timezone = check_plain($_POST['timezone']);
+
+  // Check valid timezone id
+  $zone_list = timezone_identifiers_list();
+  if (!in_array($timezone, $zone_list)) {
+    watchdog('timezone_detect', 'Attempting to set timezone for user @uid to @timezone, but that does not appear to be a valid timezone id; aborting.', array('@uid' => $user->uid, '@timezone' => $timezone), WATCHDOG_ERROR);
+    drupal_set_message(t('An error has occured while attempting to set your timezone.'), 'error');
+    return '';
+  }
+
+  // Save timezone to account
   $edit['timezone'] = $timezone;
   user_save($user, $edit);
   watchdog('timezone_detect', 'Set timezone for user @uid to @timezone.', array('@uid' => $user->uid, '@timezone' => $timezone));
 
-  // Unset sessionf flag
+  // Unset session flag
   unset($_SESSION['timezone_detect']['update_timezone']);
 }
 
 /**
- * Access callback for timezone_detect_set_timezone()
+ * Access callback for timezone_detect_set_timezone().
  */
 function timezone_detect_set_timezone_access() {
   global $user;
@@ -112,7 +126,7 @@ function timezone_detect_set_timezone_access() {
 }
 
 /**
- * Add the javascript which will update the user's timezone via ajax callback
+ * Add the javascript that will update the user's timezone via ajax callback.
  */
 function timezone_detect_add_js() {
   // Add helper js
@@ -121,7 +135,7 @@ function timezone_detect_add_js() {
 
   // Add library js
   if (module_exists('libraries')) {
-    libraries_load('jstz');
+    libraries_load('jstimezonedetect');
   }
   else {
     // If libraries modules does not exist, look in local module folder

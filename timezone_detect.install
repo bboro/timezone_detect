@@ -11,7 +11,7 @@ if (!defined('TIMEZONE_DETECT_LIBRARY_FILENAME')) {
   define('TIMEZONE_DETECT_LIBRARY_FILENAME', 'jstz.js');
 }
 if (!defined('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL')) {
-  define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://raw.github.com/JordanMagnuson/jstimezonedetect/master/jstz.js');
+  define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js');
 }
 
 /**
@@ -19,8 +19,8 @@ if (!defined('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL')) {
  */
 function timezone_detect_requirements($phase) {
   // Path to library
-  if (module_exists('libraries') && $path = libraries_get_path('jstz')) {
-    $path .= '/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
+  if (module_exists('libraries') && libraries_get_path('jstimezonedetect')) {
+    $path = libraries_get_path('jstimezonedetect') . '/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
   }
   else {
     $path = drupal_get_path('module', 'timezone_detect') . '/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
@@ -37,7 +37,8 @@ function timezone_detect_requirements($phase) {
     $requirements['timezone_detect']['value'] = $version;
 
     // Check for updates, cache remote library file version...
-    if ($cache = cache_get('timezone_detect_update_version')) {
+    $cache = cache_get('timezone_detect_update_version');
+    if ($cache) {
       $update_version = $cache->data;
     }
     else {
@@ -96,7 +97,7 @@ function timezone_detect_requirements($phase) {
  * @return
  *   A string containing the version of a file, or FALSE if no version detected or file fails to open.
  *
- * @see libraries_get_version().
+ * @see libraries_get_version()
  */
 function _timezone_detect_get_version($path, $options = array()) {
   $version = FALSE;
