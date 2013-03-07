@@ -103,3 +103,4 @@ More modules for minimizing timezone frustrations:
 - Timezone Picker (http://drupal.org/project/timezone_picker)
   Provides a wonderful interactive map for selecting timezones on user account 
   pages. 
+  
