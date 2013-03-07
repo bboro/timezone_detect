@@ -4,10 +4,10 @@
  */
 jQuery(document).ready(function () {
   
-  // Determine timezone from browser client using jsTimezoneDetect library
+  // Determine timezone from browser client using jsTimezoneDetect library.
   var tz = jstz.determine();
   
-  // Post timezone to callback url via ajax
+  // Post timezone to callback url via ajax.
   jQuery.ajax({
     type: 'POST',
     url: '/timezone-detect/set-timezone',
