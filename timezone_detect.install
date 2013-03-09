@@ -20,19 +20,19 @@ if (!defined('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL')) {
 function timezone_detect_requirements($phase) {
   // Path to library.
   if (module_exists('libraries') && libraries_get_path('jstimezonedetect')) {
-    $path = libraries_get_path('jstimezonedetect') . '/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
+    $path = libraries_get_path('jstimezonedetect') . '/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
   }
   else {
-    $path = drupal_get_path('module', 'timezone_detect') . '/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
+    $path = drupal_get_path('module', 'timezone_detect') . '/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
   }
   $t = get_t();
   $requirements = array(
     'timezone_detect' => array(
-      'title' => $t('jsTimezoneDetect library'),
+      'title' => $t('Timezone Detect'),
     ),
   );
 
-  // File exists.
+  // Library file exists.
   if (file_exists($path)) {
     // Get version information.
     $version = _timezone_detect_get_version($path);
@@ -44,20 +44,22 @@ function timezone_detect_requirements($phase) {
       $update_version = $cache->data;
     }
     else {
-      $update_version = _timezone_detect_get_version(TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL);
+      $update_version = _timezone_detect_get_version(variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL));
+
+      // Cache the remote file version for one week.
       cache_set('timezone_detect_update_version', $update_version, 'cache', REQUEST_TIME + 60 * 60 * 24 * 7);
     }
 
     // No update info.
     if (!$update_version) {
       $requirements['timezone_detect']['value'] .= $t(' - no update data available');
-      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library exists but update information could not be found. If desired, you can manually check <a href="@library_download_url">@library_download_url</a> for a newer version of the library.', array('@library_download_url' => TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL));
+      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library exists but update information could not be found. If desired, you can manually check <a href="@library_download_url">@library_download_url</a> for a newer version of the library.', array('@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL)));
       $requirements['timezone_detect']['severity'] = REQUIREMENT_WARNING;
     }
     // Update available.
     elseif (version_compare($version, $update_version, '<')) {
       $requirements['timezone_detect']['value'] .= $t(' - newer version available');
-      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is installed, but a newer version is available. You may wish to download the latest version from <a href="@library_download_url">@library_download_url</a> and overwrite the current version located at %path.', array('@library_download_url' => TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL, '%path' => $path));
+      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is installed, but a newer version is available. You may wish to download the latest version from <a href="@library_download_url">@library_download_url</a> and overwrite the current version located at %path.', array('@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL), '%path' => $path));
       $requirements['timezone_detect']['severity'] = REQUIREMENT_WARNING;
     }
     // Everything okay.
@@ -67,15 +69,15 @@ function timezone_detect_requirements($phase) {
     }
   }
 
-  // File does not exist.
+  // Library file does not exist.
   else {
     if (module_exists('libraries')) {
       // If libraries module exists, but jsTimezoneDetect library is not yet
       // installed, recommend default libraries directory for installation.
-      $path = 'sites/all/libraries/jstz/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
+      $path = 'sites/all/libraries/jstimezonedetect/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
     }
     $requirements['timezone_detect']['value'] = NULL;
-    $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is not installed. Please <a href="@library_download_url">download the library</a> and put it at %path.', array('@library_download_url' => TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL, '%path' => $path));
+    $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is not installed. Please <a href="@library_download_url">download the library</a> and put it at %path.', array('@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL), '%path' => $path));
     $requirements['timezone_detect']['severity'] = ($phase == 'runtime' ? REQUIREMENT_ERROR : REQUIREMENT_WARNING);
   }
 
@@ -130,4 +132,7 @@ function _timezone_detect_get_version($path, $options = array()) {
  */
 function timezone_detect_uninstall() {
   variable_del('timezone_detect_update_timezone_every_login');
+  variable_del('timezone_detect_library_website');
+  variable_del('timezone_detect_library_filename');
+  variable_del('timezone_detect_library_download_url');
 }

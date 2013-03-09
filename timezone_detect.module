@@ -4,6 +4,7 @@
  * Automatic timezone detection for new users via javascript.
  */
 
+// jsTimezeDetect library information.
 define('TIMEZONE_DETECT_LIBRARY_WEBSITE', 'http://pellepim.bitbucket.org/jstz/');
 define('TIMEZONE_DETECT_LIBRARY_FILENAME', 'jstz.js');
 define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js');
@@ -19,8 +20,25 @@ function timezone_detect_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('timezone_detect_admin_form'),
     'access arguments' => array('administer site configuration'),
-    'description' => 'Allows administrators to adjust settings for Timezone Detect.',
+    'description' => 'Configure settings for Timezone Detect.',
     'file' => 'timezone_detect.admin.inc',
+  );
+
+  $items['admin/config/regional/timezone_detect/admin'] = array(
+    'title' => 'Timezone Detect',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  // Library information
+  $items['admin/config/regional/timezone_detect/library_info'] = array(
+    'title' => 'Library information',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('timezone_detect_library_info_form'),
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Configure library information for Timezone Detect.',
+    'file' => 'timezone_detect.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
   );
 
   // Ajax callback function to set current user's timezone.
@@ -41,16 +59,16 @@ function timezone_detect_libraries_info() {
   return array(
     'jstimezonedetect' => array(
       'name' => t('jsTimezoneDetect'),
-      'vendor url' => TIMEZONE_DETECT_LIBRARY_WEBSITE,
-      'download url' => TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL,
+      'vendor url' => variable_get('timezone_detect_library_website', TIMEZONE_DETECT_LIBRARY_WEBSITE),
+      'download url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
       'version arguments' => array(
-        'file' => TIMEZONE_DETECT_LIBRARY_FILENAME,
+        'file' => variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME),
         // Patern matches, for example: @version 0.10.0.
         'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
       ),
       'files' => array(
         'js' => array(
-          TIMEZONE_DETECT_LIBRARY_FILENAME,
+          variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME),
         ),
       ),
     ),
@@ -64,7 +82,7 @@ function timezone_detect_user_login(&$edit, $account) {
   $update_timezone_every_login = variable_get('timezone_detect_update_timezone_every_login', 0);
   if ($update_timezone_every_login || empty($account->timezone)) {
     // Set session flag to update user's timezone. Note that we cannot add the
-    // js directly from this function, as the user will be redirected after this
+    // js directly from this function, as the user is redirected after this
     // hook fires.
     $_SESSION['timezone_detect']['update_timezone'] = TRUE;
   }
@@ -105,8 +123,9 @@ function timezone_detect_set_timezone() {
   }
 
   // Save timezone to account.
+  $account = user_load($user->uid);
   $edit['timezone'] = $timezone;
-  user_save($user, $edit);
+  user_save($account, $edit);
   watchdog('timezone_detect', 'Set timezone for user @uid to @timezone.', array('@uid' => $user->uid, '@timezone' => $timezone));
 
   // Unset session flag.
@@ -141,7 +160,7 @@ function timezone_detect_add_js() {
   }
   else {
     // If libraries modules does not exist, look in local module folder.
-    $library_js = drupal_get_path('module', 'timezone_detect') . '/' . TIMEZONE_DETECT_LIBRARY_FILENAME;
+    $library_js = drupal_get_path('module', 'timezone_detect') . '/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
     drupal_add_js($library_js);
   }
 }

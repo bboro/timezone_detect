@@ -46,12 +46,13 @@ default timezone for every user at first login, so that you can:
 
 This module has all the limitations of javascript timezone detection, and the 
 jsTimezoneDetect library: It will not work for users who have javascript 
-disabled, it does not do geo-location, nor does it care very much about 
+disabled, it does not do geo-location, and does it care very much about 
 historical time zones. For more information on the limitations of 
-jsTimezoneDetect, see http://pellepim.bitbucket.org/jstz/ .
+jsTimezoneDetect, see <http://pellepim.bitbucket.org/jstz>.
 
-All of that being said, this module will generally provide pretty good "best 
-guess" timezone detection for most users.
+All of that being said, this jsTimezoneDetect will generally provide pretty good 
+"best guess" timezone detection for most users (in some situations the results 
+are more accurate than those provided by IP-based geo-location).
 
 
 ================
@@ -60,25 +61,24 @@ guess" timezone detection for most users.
 
 To use Timezone Detect, it is recommened that you first install the Libraries 
 API module (version 2.x), which you can download from 
-http://drupal.org/project/libraries . Using Libraries API allows you to download 
-updated versions of Timezone Detect without having to worry about overwriting 
-required library files.
+<http://drupal.org/project/libraries>. Using Libraries API allows you to 
+download updated versions of this module without having to worry about 
+overwriting required library files.
 
 This module requires that the jsTimezoneDetect library be downloaded 
 independently in order to function. The latest version of jsTimezoneDetect can 
 be downloaded from 
-https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js .
+<https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js>.
 
 If you have installed the Libraries API module (recommended), place the 
 downloaded file at sites/all/libraries/jstimezonedetect/jstz.js.
 
 If you have NOT installed the Libraries API module, you can place the downloaded 
 file at sites/all/modules/timezone_detect/jstz.js. If you do this, be aware that 
-you will need to re-download jstz.js any time you update the Timezone Detect 
-module.
+you will need to re-download jstz.js any time you update the this module.
 
 For general instruction on how to install and update Drupal modules see See 
-http://drupal.org/getting-started/install-contrib .
+<http://drupal.org/getting-started/install-contrib>.
 
 
 ================
@@ -91,7 +91,7 @@ When using this module it is recommended that you disable the option to "Remind
 users at login if their time zone is not set" in Drupal's regional settings, by 
 visiting admin/config/regional/settings and unchecking that option. Otherwise 
 users may be asked to set their timezone on first login even when this module 
-has already set it automatically.
+has already set it via ajax.
 
 
 ================
@@ -100,6 +100,6 @@ has already set it automatically.
 
 More modules for minimizing timezone frustrations:
 
-- Timezone Picker (http://drupal.org/project/timezone_picker)
+- Timezone Picker <http://drupal.org/project/timezone_picker>
   Provides a wonderful interactive map for selecting timezones on user account 
   pages. 
