@@ -29,7 +29,7 @@ function timezone_detect_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  // Library information
+  // Library information.
   $items['admin/config/regional/timezone_detect/library_info'] = array(
     'title' => 'Library information',
     'page callback' => 'drupal_get_form',

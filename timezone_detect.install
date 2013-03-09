@@ -59,7 +59,11 @@ function timezone_detect_requirements($phase) {
     // Update available.
     elseif (version_compare($version, $update_version, '<')) {
       $requirements['timezone_detect']['value'] .= $t(' - newer version available');
-      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is installed, but a newer version is available. You may wish to download the latest version from <a href="@library_download_url">@library_download_url</a> and overwrite the current version located at %path.', array('@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL), '%path' => $path));
+      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is installed, but a newer version is available. You may wish to download the latest version from <a href="@library_download_url">@library_download_url</a> and overwrite the current version located at %path.',
+                                                            array(
+                                                              '@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
+                                                              '%path' => $path)
+                                                            );
       $requirements['timezone_detect']['severity'] = REQUIREMENT_WARNING;
     }
     // Everything okay.
@@ -77,7 +81,11 @@ function timezone_detect_requirements($phase) {
       $path = 'sites/all/libraries/jstimezonedetect/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
     }
     $requirements['timezone_detect']['value'] = NULL;
-    $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is not installed. Please <a href="@library_download_url">download the library</a> and put it at %path.', array('@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL), '%path' => $path));
+    $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is not installed. Please <a href="@library_download_url">download the library</a> and put it at %path.',
+                                                          array(
+                                                            '@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
+                                                            '%path' => $path)
+                                                          );
     $requirements['timezone_detect']['severity'] = ($phase == 'runtime' ? REQUIREMENT_ERROR : REQUIREMENT_WARNING);
   }
 
