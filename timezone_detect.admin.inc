@@ -35,21 +35,18 @@ function timezone_detect_library_info_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t("Library website"),
     '#default_value' => variable_get('timezone_detect_library_website', TIMEZONE_DETECT_LIBRARY_WEBSITE),
-    '#options' => $options,
     '#description' => t("This should be the home page for the library, not the download url."),
   );
   $form['timezone_detect_library_filename'] = array(
     '#type' => 'textfield',
     '#title' => t("Library filename"),
     '#default_value' => variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME),
-    '#options' => $options,
     '#description' => t("Javascript filename, with extension."),
   );
   $form['timezone_detect_library_download_url'] = array(
     '#type' => 'textfield',
     '#title' => t("Library download url"),
     '#default_value' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
-    '#options' => $options,
     '#description' => t("Full download url to the library's javascript file."),
   );
 
