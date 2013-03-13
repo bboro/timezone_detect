@@ -75,9 +75,9 @@ downloaded file at sites/all/libraries/jstimezonedetect/jstz.js.
 
 If you have NOT installed the Libraries API module, you can place the downloaded 
 file at sites/all/modules/timezone_detect/jstz.js. If you do this, be aware that 
-you will need to re-download jstz.js any time you update the this module.
+you will need to re-download jstz.js any time you update this module.
 
-For general instruction on how to install and update Drupal modules see See 
+For general instruction on how to install and update Drupal modules see 
 <http://drupal.org/getting-started/install-contrib>.
 
 
@@ -91,7 +91,7 @@ When using this module it is recommended that you disable the option to "Remind
 users at login if their time zone is not set" in Drupal's regional settings, by 
 visiting admin/config/regional/settings and unchecking that option. Otherwise 
 users may be asked to set their timezone on first login even when this module 
-has already set it via ajax.
+has already set it via ajax callback.
 
 
 ================
