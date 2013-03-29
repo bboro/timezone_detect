@@ -5,134 +5,65 @@
  * (Un)installs the Timezone Detect module.
  */
 
-// When the module is first installed, the module file won't be loaded yet.
-// As a result, these constants won't be defined.
-if (!defined('TIMEZONE_DETECT_LIBRARY_FILENAME')) {
-  define('TIMEZONE_DETECT_LIBRARY_FILENAME', 'jstz.js');
-}
-if (!defined('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL')) {
-  define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js');
+/**
+ * Implements hook_enable().
+ */
+function timezone_detect_enable() {
+  drupal_set_message($message = t('The Timezone Detect module was successfully enabled.'), $type = 'status');
+
+  // Set default user timezone to "none." Otherwise this module will not do
+  // anything in its default configuration (set user timezone only if it
+  // is not set).
+  $user_default_timezone = variable_get('user_default_timezone', DRUPAL_USER_TIMEZONE_DEFAULT);
+  if ($user_default_timezone != DRUPAL_USER_TIMEZONE_EMPTY) {
+    variable_set('user_default_timezone', DRUPAL_USER_TIMEZONE_EMPTY);
+    drupal_set_message($message = t('Default user timezone set to "empty timezone" for best results with Timezone Detect.'), $type = 'status');
+  }
+
+  // Disable "remind users at login if their time zone is not set." Otherwise
+  // users may be asked to set their timezone on first login even when this
+  // module has already set it via ajax callback.
+  $empty_timezone_message = variable_get('empty_timezone_message', 0);
+  if ($empty_timezone_message != 0) {
+    variable_set('empty_timezone_message', 0);
+    drupal_set_message($message = t('"Remind users at login if their time zone is not set" set to FALSE for best results with Timezone Detect.'), $type = 'status');
+  }
 }
 
 /**
  * Implements hook_requirements().
  */
 function timezone_detect_requirements($phase) {
-  // Path to library.
-  if (module_exists('libraries') && libraries_get_path('jstimezonedetect')) {
-    $path = libraries_get_path('jstimezonedetect') . '/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
-  }
-  else {
-    $path = drupal_get_path('module', 'timezone_detect') . '/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
-  }
+  $requirements = array();
   $t = get_t();
-  $requirements = array(
-    'timezone_detect' => array(
-      'title' => $t('Timezone Detect'),
-    ),
-  );
 
-  // Library file exists.
-  if (file_exists($path)) {
-    // Get version information.
-    $version = _timezone_detect_get_version($path);
-    $requirements['timezone_detect']['value'] = $version;
-
-    // Check for updates, cache remote library file version.
-    $cache = cache_get('timezone_detect_update_version');
-    if ($cache) {
-      $update_version = $cache->data;
-    }
-    else {
-      $update_version = _timezone_detect_get_version(variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL));
-
-      // Cache the remote file version for one week.
-      cache_set('timezone_detect_update_version', $update_version, 'cache', REQUEST_TIME + 60 * 60 * 24 * 7);
-    }
-
-    // No update info.
-    if (!$update_version) {
-      $requirements['timezone_detect']['value'] .= $t(' - no update data available');
-      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library exists but update information could not be found. If desired, you can manually check <a href="@library_download_url">@library_download_url</a> for a newer version of the library.', array('@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL)));
-      $requirements['timezone_detect']['severity'] = REQUIREMENT_WARNING;
-    }
-    // Update available.
-    elseif (version_compare($version, $update_version, '<')) {
-      $requirements['timezone_detect']['value'] .= $t(' - newer version available');
-      $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is installed, but a newer version is available. You may wish to download the latest version from <a href="@library_download_url">@library_download_url</a> and overwrite the current version located at %path.',
-                                                            array(
-                                                              '@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
-                                                              '%path' => $path)
-                                                            );
-      $requirements['timezone_detect']['severity'] = REQUIREMENT_WARNING;
-    }
-    // Everything okay.
-    else {
-      $requirements['timezone_detect']['value'] .= $t(' - up to date');
-      $requirements['timezone_detect']['severity'] = REQUIREMENT_OK;
-    }
+  // Check that default user timezone is set to "empty timezone", or that
+  // Timezone Detect is configured to update user timezone on every login
+  // (otherwise automatic timezone detection will not work).
+  $default_timezone_okay = FALSE;
+  $user_default_timezone = variable_get('user_default_timezone', DRUPAL_USER_TIMEZONE_DEFAULT);
+  $update_timezone_every_login = variable_get('timezone_detect_update_timezone_every_login', 0);
+  if ($update_timezone_every_login || $user_default_timezone == DRUPAL_USER_TIMEZONE_EMPTY) {
+    $default_timezone_okay = TRUE;
   }
 
-  // Library file does not exist.
-  else {
-    if (module_exists('libraries')) {
-      // If libraries module exists, but jsTimezoneDetect library is not yet
-      // installed, recommend default libraries directory for installation.
-      $path = 'sites/all/libraries/jstimezonedetect/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
-    }
-    $requirements['timezone_detect']['value'] = NULL;
-    $requirements['timezone_detect']['description'] = $t('The jsTimezoneDetect library is not installed. Please <a href="@library_download_url">download the library</a> and put it at %path.',
-                                                          array(
-                                                            '@library_download_url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
-                                                            '%path' => $path)
-                                                          );
-    $requirements['timezone_detect']['severity'] = ($phase == 'runtime' ? REQUIREMENT_ERROR : REQUIREMENT_WARNING);
+  switch ($phase) {
+    case 'runtime':
+      if (!$default_timezone_okay) {
+        $requirements['timezone_detect'] = array(
+          'title' => $t('Timezone Detect'),
+          'value' => $t('Incompatible default user timezone'),
+          'description' => $t('For automatic timezone detection to work correctly, please change default user timezone to "empty timezone" on your site\'s !regional_settings_url.', array(
+            '!regional_settings_url' => l($t('regional settings page'), 'admin/config/regional/settings'),
+            )
+          ),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
   }
 
   return $requirements;
-}
-
-/**
- * Gets the version information from a file.
- *
- * @param string $path
- *   The path of the file to check.
- * @param array $options
- *   An associative array containing with the following keys:
- *   - pattern: A string containing a regular expression (PCRE) to match the
- *     library version. For example: '@version\s+([0-9a-zA-Z\.-]+)@'.
- *   - lines: (optional) The maximum number of lines to search the pattern in.
- *     Defaults to 20.
- *   - cols: (optional) The maximum number of characters per line to take into
- *     account. Defaults to 200. In case of minified or compressed files, this
- *     prevents reading the entire file into memory.
- *
- * @return string
- *   A string containing the version of a file, or FALSE if no version detected
- *   or file fails to open.
- *
- * @see libraries_get_version()
- */
-function _timezone_detect_get_version($path, $options = array()) {
-  $version = FALSE;
-  // Provide defaults.
-  $options += array(
-    'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
-    'lines' => 20,
-    'cols' => 200,
-  );
-  $file = fopen($path, 'r');
-  if ($file) {
-    while ($options['lines'] && $line = fgets($file, $options['cols'])) {
-      if (preg_match($options['pattern'], $line, $matches)) {
-        $version = $matches[1];
-        break;
-      }
-      $options['lines']--;
-    }
-    fclose($file);
-  }
-  return $version;
 }
 
 /**
@@ -140,7 +71,4 @@ function _timezone_detect_get_version($path, $options = array()) {
  */
 function timezone_detect_uninstall() {
   variable_del('timezone_detect_update_timezone_every_login');
-  variable_del('timezone_detect_library_website');
-  variable_del('timezone_detect_library_filename');
-  variable_del('timezone_detect_library_download_url');
 }

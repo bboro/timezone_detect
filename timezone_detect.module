@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Automatic timezone detection for new users via javascript.
+ * Module provides automatic timezone detection via javascript.
  */
 
 // jsTimezeDetect library information.
@@ -20,25 +20,13 @@ function timezone_detect_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('timezone_detect_admin_form'),
     'access arguments' => array('administer site configuration'),
-    'description' => 'Configure settings for Timezone Detect.',
+    'description' => 'Configure timezone detection settings.',
     'file' => 'timezone_detect.admin.inc',
   );
 
   $items['admin/config/regional/timezone_detect/admin'] = array(
     'title' => 'Timezone Detect',
     'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-
-  // Library information.
-  $items['admin/config/regional/timezone_detect/library_info'] = array(
-    'title' => 'Library information',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('timezone_detect_library_info_form'),
-    'access arguments' => array('administer site configuration'),
-    'description' => 'Configure library information for Timezone Detect.',
-    'file' => 'timezone_detect.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 10,
   );
 
   // Ajax callback function to set current user's timezone.
@@ -53,23 +41,17 @@ function timezone_detect_menu() {
 }
 
 /**
- * Implements hook_libraries_info().
+ * Implements hook_library().
  */
-function timezone_detect_libraries_info() {
+function timezone_detect_library() {
+  $path = drupal_get_path('module', 'timezone_detect');
   return array(
-    'jstimezonedetect' => array(
-      'name' => t('jsTimezoneDetect'),
-      'vendor url' => variable_get('timezone_detect_library_website', TIMEZONE_DETECT_LIBRARY_WEBSITE),
-      'download url' => variable_get('timezone_detect_library_download_url', TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL),
-      'version arguments' => array(
-        'file' => variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME),
-        // Patern matches, for example: @version 0.10.0.
-        'pattern' => '@version\s+([0-9a-zA-Z\.-]+)@',
-      ),
-      'files' => array(
-        'js' => array(
-          variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME),
-        ),
+    'jstz' => array(
+      'title' => t('jsTimezoneDetect'),
+      'website' => TIMEZONE_DETECT_LIBRARY_WEBSITE,
+      'version' => '1.0.5',
+      'js' => array(
+        $path . '/' . TIMEZONE_DETECT_LIBRARY_FILENAME => array(),
       ),
     ),
   );
@@ -89,9 +71,9 @@ function timezone_detect_user_login(&$edit, $account) {
 }
 
 /**
- * Implements hook_page_alter().
+ * Implements hook_page_build().
  */
-function timezone_detect_page_alter(&$page) {
+function timezone_detect_page_build(&$page) {
   // Update user's timezone if session flag is set.
   if (isset($_SESSION['timezone_detect']['update_timezone'])) {
     // Add javascript that will update the user's timezone via ajax callback.
@@ -109,7 +91,6 @@ function timezone_detect_set_timezone() {
   // Timezone should be an IANA/Olson timezone id provided via $_POST.
   if (!isset($_POST['timezone'])) {
     watchdog('timezone_detect', 'Attempting to set timezone for user @uid, but no timezone found in $_POST data; aborting.', array('@uid' => $user->uid), WATCHDOG_ERROR);
-    drupal_set_message(t('An error has occured while attempting to set your timezone.'), 'error');
     return '';
   }
   $timezone = check_plain($_POST['timezone']);
@@ -118,7 +99,6 @@ function timezone_detect_set_timezone() {
   $zone_list = timezone_identifiers_list();
   if (!in_array($timezone, $zone_list)) {
     watchdog('timezone_detect', 'Attempting to set timezone for user @uid to @timezone, but that does not appear to be a valid timezone id; aborting.', array('@uid' => $user->uid, '@timezone' => $timezone), WATCHDOG_ERROR);
-    drupal_set_message(t('An error has occured while attempting to set your timezone.'), 'error');
     return '';
   }
 
@@ -150,17 +130,10 @@ function timezone_detect_set_timezone_access() {
  * Add the javascript that will update the user's timezone via ajax callback.
  */
 function timezone_detect_add_js() {
+  // Add library js.
+  drupal_add_library('timezone_detect', 'jstz');
+
   // Add helper js.
   $helper_js = drupal_get_path('module', 'timezone_detect') . '/timezone_detect.js';
   drupal_add_js($helper_js);
-
-  // Add library js.
-  if (module_exists('libraries')) {
-    libraries_load('jstimezonedetect');
-  }
-  else {
-    // If libraries modules does not exist, look in local module folder.
-    $library_js = drupal_get_path('module', 'timezone_detect') . '/' . variable_get('timezone_detect_library_filename', TIMEZONE_DETECT_LIBRARY_FILENAME);
-    drupal_add_js($library_js);
-  }
 }
