@@ -9,6 +9,13 @@ define('TIMEZONE_DETECT_LIBRARY_WEBSITE', 'http://pellepim.bitbucket.org/jstz/')
 define('TIMEZONE_DETECT_LIBRARY_FILENAME', 'jstz.js');
 define('TIMEZONE_DETECT_LIBRARY_DOWNLOAD_URL', 'https://bitbucket.org/pellepim/jstimezonedetect/raw/default/jstz.js');
 
+// Detection modes configured via administration form.
+// Note these are strings instead of integers because system_settings_form()
+// saves variable values as strings.
+define('TIMEZONE_DETECT_MODE_DEFAULT', '0');
+define('TIMEZONE_DETECT_MODE_LOGIN', '1');
+define('TIMEZONE_DETECT_MODE_ALWAYS', '2');
+
 /**
  * Implements hook_menu().
  */
@@ -61,8 +68,7 @@ function timezone_detect_library() {
  * Implements hook_user_login().
  */
 function timezone_detect_user_login(&$edit, $account) {
-  $update_timezone_every_login = variable_get('timezone_detect_update_timezone_every_login', 0);
-  if ($update_timezone_every_login || empty($account->timezone)) {
+  if (variable_get('timezone_detect_mode') === TIMEZONE_DETECT_MODE_LOGIN || empty($account->timezone)) {
     // Set session flag to update user's timezone. Note that we cannot add the
     // js directly from this function, as the user is redirected after this
     // hook fires.
@@ -74,9 +80,8 @@ function timezone_detect_user_login(&$edit, $account) {
  * Implements hook_page_build().
  */
 function timezone_detect_page_build(&$page) {
-  // Update user's timezone if session flag is set.
-  if (isset($_SESSION['timezone_detect']['update_timezone'])) {
-    // Add javascript that will update the user's timezone via ajax callback.
+  // Include the javascript only when appropriate.
+  if (isset($_SESSION['timezone_detect']['update_timezone']) || (timezone_detect_set_timezone_access() && variable_get('timezone_detect_mode') === TIMEZONE_DETECT_MODE_ALWAYS)) {
     timezone_detect_add_js();
   }
 }
@@ -94,6 +99,10 @@ function timezone_detect_set_timezone() {
     return '';
   }
   $timezone = check_plain($_POST['timezone']);
+
+  // Keep track of the last submitted timezone in case it's not valid so that
+  // we don't keep POSTing it on every request.
+  $_SESSION['timezone_detect']['current_timezone'] = $timezone;
 
   // Check valid timezone id.
   $zone_list = timezone_identifiers_list();
@@ -136,4 +145,13 @@ function timezone_detect_add_js() {
   // Add helper js.
   $helper_js = drupal_get_path('module', 'timezone_detect') . '/timezone_detect.js';
   drupal_add_js($helper_js);
+
+  // Store the current timezone for comparison.
+  $timezone = !empty($_SESSION['timezone_detect']['current_timezone']) ? $_SESSION['timezone_detect']['current_timezone'] : $GLOBALS['user']->timezone;
+  $setting = array(
+    'timezone_detect' => array(
+      'current_timezone' => check_markup($timezone),
+    ),
+  );
+  drupal_add_js($setting, 'setting');
 }

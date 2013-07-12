@@ -42,8 +42,8 @@ function timezone_detect_requirements($phase) {
   // (otherwise automatic timezone detection will not work).
   $default_timezone_okay = FALSE;
   $user_default_timezone = variable_get('user_default_timezone', DRUPAL_USER_TIMEZONE_DEFAULT);
-  $update_timezone_every_login = variable_get('timezone_detect_update_timezone_every_login', 0);
-  if ($update_timezone_every_login || $user_default_timezone == DRUPAL_USER_TIMEZONE_EMPTY) {
+  $timezone_update_mode = variable_get('timezone_detect_mode');
+  if ($timezone_update_mode != TIMEZONE_DETECT_MODE_DEFAULT || $user_default_timezone == DRUPAL_USER_TIMEZONE_EMPTY) {
     $default_timezone_okay = TRUE;
   }
 
@@ -70,5 +70,14 @@ function timezone_detect_requirements($phase) {
  * Implements hook_uninstall().
  */
 function timezone_detect_uninstall() {
+  variable_del('timezone_detect_mode');
+}
+
+/**
+ * Migrate variable used for saving timezone detection mode.
+ */
+function timezone_detect_update_7100() {
+  $current_mode = variable_get('timezone_detect_update_timezone_every_login', TIMEZONE_DETECT_MODE_DEFAULT);
+  variable_set('timezone_detect_mode', $current_mode);
   variable_del('timezone_detect_update_timezone_every_login');
 }
