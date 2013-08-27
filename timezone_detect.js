@@ -16,6 +16,11 @@ jQuery(document).ready(function () {
       dataType: 'json',
       data: 'timezone=' + tz.name()
     });
+
+    // Set any timezone select on this page to the detected timezone.
+    jQuery('select[name="timezone"] > option[value="' + tz.name() + '"]')
+      .closest('select')
+      .val(tz.name());
   }
 
 });
