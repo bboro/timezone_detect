@@ -81,7 +81,7 @@ function timezone_detect_user_login(&$edit, $account) {
  */
 function timezone_detect_page_build(&$page) {
   // Include the javascript only when appropriate.
-  if (isset($_SESSION['timezone_detect']['update_timezone']) || (timezone_detect_set_timezone_access() && variable_get('timezone_detect_mode') === TIMEZONE_DETECT_MODE_ALWAYS)) {
+  if (isset($_SESSION['timezone_detect']['update_timezone']) || (!user_is_anonymous() && variable_get('timezone_detect_mode') === TIMEZONE_DETECT_MODE_ALWAYS)) {
     timezone_detect_add_js();
   }
 }
@@ -123,20 +123,6 @@ function timezone_detect_set_timezone() {
   // Unset session flag regarldess of whether they are logged in or not to avoid
   // repeated attempts at this process that are likely to fail.
   unset($_SESSION['timezone_detect']['update_timezone']);
-}
-
-/**
- * Access callback for timezone_detect_set_timezone().
- */
-function timezone_detect_set_timezone_access() {
-  global $user;
-
-  // Don't let anonymous users access.
-  if (empty($user->uid)) {
-    return FALSE;
-  }
-
-  return TRUE;
 }
 
 /**
