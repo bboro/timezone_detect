@@ -40,7 +40,7 @@ function timezone_detect_menu() {
   $items['timezone-detect/set-timezone'] = array(
     'title' => 'Update session timezone',
     'page callback' => 'timezone_detect_set_timezone',
-    'access callback' => 'timezone_detect_set_timezone_access',
+    'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 
@@ -92,32 +92,36 @@ function timezone_detect_page_build(&$page) {
 function timezone_detect_set_timezone() {
   global $user;
 
-  // Check for $_POST data.
-  // Timezone should be an IANA/Olson timezone id provided via $_POST.
-  if (!isset($_POST['timezone'])) {
-    watchdog('timezone_detect', 'Attempting to set timezone for user @uid, but no timezone found in $_POST data; aborting.', array('@uid' => $user->uid), WATCHDOG_ERROR);
-    return '';
+  // If they are logged in, set some data.
+  if (!user_is_anonymous()) {
+    // Check for $_POST data.
+    // Timezone should be an IANA/Olson timezone id provided via $_POST.
+    if (!isset($_POST['timezone'])) {
+      watchdog('timezone_detect', 'Attempting to set timezone for user @uid, but no timezone found in $_POST data; aborting.', array('@uid' => $user->uid), WATCHDOG_ERROR);
+      return '';
+    }
+    $timezone = check_plain($_POST['timezone']);
+
+    // Keep track of the last submitted timezone in case it's not valid so that
+    // we don't keep POSTing it on every request.
+    $_SESSION['timezone_detect']['current_timezone'] = $timezone;
+
+    // Check valid timezone id.
+    $zone_list = timezone_identifiers_list();
+    if (!in_array($timezone, $zone_list)) {
+      watchdog('timezone_detect', 'Attempting to set timezone for user @uid to @timezone, but that does not appear to be a valid timezone id; aborting.', array('@uid' => $user->uid, '@timezone' => $timezone), WATCHDOG_ERROR);
+      return '';
+    }
+
+    // Save timezone to account.
+    $account = user_load($user->uid);
+    $edit['timezone'] = $timezone;
+    user_save($account, $edit);
+    watchdog('timezone_detect', 'Set timezone for user @uid to @timezone.', array('@uid' => $user->uid, '@timezone' => $timezone));
   }
-  $timezone = check_plain($_POST['timezone']);
 
-  // Keep track of the last submitted timezone in case it's not valid so that
-  // we don't keep POSTing it on every request.
-  $_SESSION['timezone_detect']['current_timezone'] = $timezone;
-
-  // Check valid timezone id.
-  $zone_list = timezone_identifiers_list();
-  if (!in_array($timezone, $zone_list)) {
-    watchdog('timezone_detect', 'Attempting to set timezone for user @uid to @timezone, but that does not appear to be a valid timezone id; aborting.', array('@uid' => $user->uid, '@timezone' => $timezone), WATCHDOG_ERROR);
-    return '';
-  }
-
-  // Save timezone to account.
-  $account = user_load($user->uid);
-  $edit['timezone'] = $timezone;
-  user_save($account, $edit);
-  watchdog('timezone_detect', 'Set timezone for user @uid to @timezone.', array('@uid' => $user->uid, '@timezone' => $timezone));
-
-  // Unset session flag.
+  // Unset session flag regarldess of whether they are logged in or not to avoid
+  // repeated attempts at this process that are likely to fail.
   unset($_SESSION['timezone_detect']['update_timezone']);
 }
 
