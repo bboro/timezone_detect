@@ -1,6 +1,8 @@
 /**
  * @file
  * Determine and set user's timezone on page load.
+ * 
+ * @todo: Use Drupal.behaviors?
  */
 jQuery(document).ready(function () {
 

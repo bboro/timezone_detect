@@ -7,6 +7,10 @@
 
 /**
  * Administration form.
+ *
+ * @todo:
+ *   - Option to notify user when their timezone is set automatically.
+ *   - Option to use cdnjs for jstz library, rather than local file.
  */
 function timezone_detect_admin_form($form, &$form_state) {
 
