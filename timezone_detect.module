@@ -140,7 +140,7 @@ function timezone_detect_add_js() {
   $timezone = !empty($_SESSION['timezone_detect']['current_timezone']) ? $_SESSION['timezone_detect']['current_timezone'] : $GLOBALS['user']->timezone;
   $setting = array(
     'timezone_detect' => array(
-      'current_timezone' => check_markup($timezone),
+      'current_timezone' => $timezone,
     ),
   );
   drupal_add_js($setting, 'setting');
