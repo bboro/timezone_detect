@@ -117,7 +117,9 @@ function timezone_detect_set_timezone() {
     $account = user_load($user->uid);
     $edit['timezone'] = $timezone;
     user_save($account, $edit);
-    watchdog('timezone_detect', 'Set timezone for user @uid to @timezone.', array('@uid' => $user->uid, '@timezone' => $timezone));
+    if (variable_get('timezone_detect_success_watchdog', TRUE)) {
+      watchdog('timezone_detect', 'Set timezone for user @uid to @timezone.', array('@uid' => $user->uid, '@timezone' => $timezone));
+    }
   }
 
   // Unset session flag regarldess of whether they are logged in or not to avoid
