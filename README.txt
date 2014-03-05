@@ -1,6 +1,6 @@
-================
+================================================================================
  INTRODUCTION
-================
+================================================================================
 
 Original author and current maintainer: 
 - Jordan Magnuson <http://drupal.org/user/269983>
@@ -11,9 +11,9 @@ timezone via javascript. It can set a user's timezone automatically upon first
 login, and update it on every login if desired.
 
 
-================
+================================================================================
  BENEFITS
-================
+================================================================================
 
 The setting of user timezones is often fraught with confusion and frustration.
 
@@ -40,9 +40,9 @@ default timezone for every user at first login, so that you can:
   timezones manually.
 
 
-================
+================================================================================
  LIMITATIONS
-================
+================================================================================
 
 This module has all the limitations of javascript timezone detection, and the 
 jsTimezoneDetect library: It will not work for users who have javascript 
@@ -55,24 +55,48 @@ guess" timezone detection for most users. It accounts for daylight savings time,
 and almost always selects a timezone that can be used equivalently to the user's 
 actual timezone, if not actually the same IANA ID.
 
-Javascript timezone detection actually produces more accurate results than 
-IP-based geolocation methods in some situations, such as when users are in a 
-region that has recently changed timezones, or for users on border areas in low
-population regions, where geolocation data may be sparse and inconsistent. 
+
+================================================================================
+JAVASCRIPT TIMEZONE DETECTION COMPARED TO OTHER METHODS
+================================================================================
+
+In creating this module I did a decent bit of research while attempting to find 
+the best possible method for automatic timezone detection for web users; I was 
+open to alternative solutions (such as IP-based and browser-based geolocation 
+methods), and considered a wide variety of libraries, APIs, and web services. 
+In the end I determined that javascript detection was best for my needs despite 
+its limitations, primarily because:
+
+- IP-based geolocation methods break down for users who are behind a proxy, 
+using a VPN, or are in a region that has recently changed timezones (or for 
+users on border areas in low population regions, where geolocation data may be 
+sparse and inconsistent).
+
+- Browser-based geolocation, while often very accurate (since it takes multiple 
+factors into account), is not silent: the user must pass a browser alert and 
+click a button to "allow access to your location," which many users are loath 
+to do.
+
+The biggest downfall of the javascript method is that it will often pick an 
+"equivalent timezone" rather than the user's "actual" IANA timezone code (so 
+"America/Chicago" may be chosen for a user instead of "America/Winnipeg", for 
+instance, which are for all intents and purposes, equivalent timezones). For 
+more information about the limitations of javascript timezone detection, see the 
+readme, or visit <http://pellepim.bitbucket.org/jstz>.
 
 
-================
+================================================================================
  INSTALLATION
-================
+================================================================================
 
 This module has no special installation requirements. For general instruction on 
 how to install and update Drupal modules see 
 <http://drupal.org/getting-started/install-contrib>.
 
 
-================
+================================================================================
  CONFIGURATION
-================
+================================================================================
 
 This module can be configured by visiting admin/config/regional/timezone_detect.
 
@@ -84,9 +108,9 @@ has already set it via ajax callback. This setting is disabled automatically
 when Timezone Detect is first enabled.
 
 
-================
+================================================================================
  RECOMMENDED
-================
+================================================================================
 
 More modules for minimizing timezone frustrations:
 
