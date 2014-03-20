@@ -14,7 +14,7 @@ jQuery(document).ready(function () {
     // Post timezone to callback url via ajax.
     jQuery.ajax({
       type: 'POST',
-      url: Drupal.settings.basePath + 'timezone-detect/set-timezone',
+      url: Drupal.settings.basePath + 'timezone-detect/ajax/set-timezone',
       dataType: 'json',
       data: 'timezone=' + tz.name()
     });

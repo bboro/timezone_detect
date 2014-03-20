@@ -37,7 +37,7 @@ function timezone_detect_menu() {
   );
 
   // Ajax callback function to set current user's timezone.
-  $items['timezone-detect/set-timezone'] = array(
+  $items['timezone-detect/ajax/set-timezone'] = array(
     'title' => 'Update session timezone',
     'page callback' => 'timezone_detect_set_timezone',
     'access callback' => TRUE,
