@@ -33,7 +33,7 @@ function timezone_detect_admin_form($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t("Log successful events in watchdog"),
     '#default_value' => variable_get('timezone_detect_success_watchdog', TRUE),
-    '#description' => t("By default, Timezone Detect will create a log entry every time it sets a users timezone. This can create unnecessary noise in your log files so you are likely to want to disable this once you are confident the feature works."),
+    '#description' => t("By default, Timezone Detect will create a log entry every time it sets a user's timezone. This can create unnecessary noise in your log files so you are likely to want to disable this once you are confident the feature works."),
   );
 
   return system_settings_form($form);
