@@ -131,19 +131,25 @@ function timezone_detect_set_timezone() {
  * Add the javascript that will update the user's timezone via ajax callback.
  */
 function timezone_detect_add_js() {
-  // Add library js.
-  drupal_add_library('timezone_detect', 'jstz');
+  $added = &drupal_static(__FUNCTION__, FALSE);
+  if (!$added) {
+    // Add library js.
+    drupal_add_library('timezone_detect', 'jstz');
 
-  // Add helper js.
-  $helper_js = drupal_get_path('module', 'timezone_detect') . '/timezone_detect.js';
-  drupal_add_js($helper_js);
+    // Add helper js.
+    $helper_js = drupal_get_path('module', 'timezone_detect') . '/timezone_detect.js';
+    drupal_add_js($helper_js);
 
-  // Store the current timezone for comparison.
-  $timezone = !empty($_SESSION['timezone_detect']['current_timezone']) ? $_SESSION['timezone_detect']['current_timezone'] : $GLOBALS['user']->timezone;
-  $setting = array(
-    'timezone_detect' => array(
-      'current_timezone' => $timezone,
-    ),
-  );
-  drupal_add_js($setting, 'setting');
+    // Store the current timezone for comparison.
+    $timezone = !empty($_SESSION['timezone_detect']['current_timezone']) ? $_SESSION['timezone_detect']['current_timezone'] : $GLOBALS['user']->timezone;
+    $setting = array(
+      'timezone_detect' => array(
+        'current_timezone' => $timezone,
+      ),
+    );
+    drupal_add_js($setting, 'setting');
+
+    // Mark as added so we don't do it again.
+    $added = TRUE;
+  }
 }
