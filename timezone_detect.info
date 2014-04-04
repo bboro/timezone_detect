@@ -2,4 +2,3 @@ name = Timezone Detect
 description = Provides automatic timezone detection via javascript.
 package = Date/Time
 core = 6.x
-

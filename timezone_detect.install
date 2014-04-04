@@ -26,7 +26,7 @@ function timezone_detect_enable() {
   $empty_timezone_message = variable_get('empty_timezone_message', 0);
   if ($empty_timezone_message != 0) {
     variable_set('empty_timezone_message', 0);
-    drupal_set_message( t('"Remind users at login if their time zone is not set" set to FALSE for best results with Timezone Detect.'), 'status');
+    drupal_set_message(t('"Remind users at login if their time zone is not set" set to FALSE for best results with Timezone Detect.'), 'status');
   }
 }
 
