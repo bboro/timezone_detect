@@ -117,7 +117,7 @@
            */
           dst_start_for = function (tz_name) {
 
-            var ru_pre_dst_change = new Date(2010, 6, 15, 1, 0, 0, 0), 
+            var ru_pre_dst_change = new Date(2010, 6, 15, 1, 0, 0, 0),
                 dst_starts = {
                     'America/Denver':       new Date(2011, 2, 13, 3, 0, 0, 0),
                     'America/Mazatlan':     new Date(2011, 3, 3, 3, 0, 0, 0),
@@ -163,7 +163,7 @@
       return {
           determine: determine,
           date_is_dst: date_is_dst,
-          dst_start_for: dst_start_for 
+          dst_start_for: dst_start_for
       };
   }());
 
@@ -206,7 +206,7 @@
           },
 
           timezone_name = tz_name,
-          
+  
           /**
            * Checks if a timezone has possible ambiguities. I.e timezones that are similar.
            *
