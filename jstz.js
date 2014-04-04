@@ -104,7 +104,7 @@
               var key = lookup_key();
               return new jstz.TimeZone(jstz.olson.timezones[key]);
           },
-          
+
           /**
            * This object contains information on when daylight savings starts for
            * different timezones.
@@ -117,7 +117,7 @@
            */
           dst_start_for = function (tz_name) {
 
-            var ru_pre_dst_change = new Date(2010, 6, 15, 1, 0, 0, 0), // In 2010 Russia had DST, this allows us to detect Russia :)
+            var ru_pre_dst_change = new Date(2010, 6, 15, 1, 0, 0, 0), 
                 dst_starts = {
                     'America/Denver':       new Date(2011, 2, 13, 3, 0, 0, 0),
                     'America/Mazatlan':     new Date(2011, 3, 3, 3, 0, 0, 0),
