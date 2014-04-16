@@ -79,7 +79,7 @@ function timezone_detect_user($op, &$edit, &$account, $category = NULL) {
         // this hook fires.
         $_SESSION['timezone_detect']['update_timezone'] = TRUE;
       }
-    break;
+      break;
   }
 }
 
@@ -130,10 +130,10 @@ function timezone_detect_set_timezone() {
 function timezone_detect_add_js() {
   // Add jstz.
   $path = drupal_get_path('module', 'timezone_detect');
-  drupal_add_js($path .'/jstz.js');
+  drupal_add_js($path . '/jstz.js');
 
   // Add helper js.
-  drupal_add_js($path .'/timezone_detect.js');
+  drupal_add_js($path . '/timezone_detect.js');
 
   // Store the current timezone for comparison.
   $timezone = !empty($_SESSION['timezone_detect']['current_timezone']) ? $_SESSION['timezone_detect']['current_timezone'] : $GLOBALS['user']->timezone;
