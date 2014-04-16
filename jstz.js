@@ -65,7 +65,6 @@
                                                   : get_january_offset(date.getFullYear()))),
                   date_offset = get_date_offset(date);
 
-
               return (base_offset - date_offset) !== 0;
           },
 
