@@ -134,7 +134,14 @@ function timezone_detect_add_js() {
     drupal_add_js($helper_js);
 
     // Store the current timezone for comparison.
-    $timezone = !empty($_SESSION['timezone_detect']['current_timezone']) ? $_SESSION['timezone_detect']['current_timezone'] : $GLOBALS['user']->timezone;
+    $timezone = '';
+    if (!empty($_SESSION['timezone_detect']['current_timezone'])) {
+      $timezone = $_SESSION['timezone_detect']['current_timezone'];
+    }
+    elseif (!empty($GLOBALS['user']->timezone)) {
+      $timezone = $GLOBALS['user']->timezone;
+    }
+
     $setting = array(
       'timezone_detect' => array(
         'current_timezone' => $timezone,
