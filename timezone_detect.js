@@ -16,7 +16,10 @@ jQuery(document).ready(function () {
       type: 'POST',
       url: Drupal.settings.basePath + 'timezone-detect/ajax/set-timezone',
       dataType: 'json',
-      data: 'timezone=' + tz.name()
+      data: {
+        timezone: tz.name(), 
+        token: Drupal.settings.timezone_detect.token
+      }
     });
 
     // Set any timezone select on this page to the detected timezone.
