@@ -9,9 +9,9 @@ Drupal 6.x port, and 6.x maintainer:
 - Alex Borsody <https://drupal.org/user/473596>
 
 Timezone Detect is a lightweight Drupal module that leverages the 
-jsTimezoneDetect library for automatic detection and setting of a user's 
-timezone via javascript. It can set a user's timezone automatically upon first 
-login, and update it on every login if desired.
+jsTimezoneDetect library (included with the module) for automatic detection and 
+setting of a user's timezone via javascript. It can set a user's timezone 
+automatically upon first login, and update it on every login if desired.
 
 
 ================================================================================
@@ -91,11 +91,19 @@ readme, or visit <http://pellepim.bitbucket.org/jstz>.
 ================================================================================
  INSTALLATION
 ================================================================================
+Note: The jsTimezoneDetect library which this module uses is included in the 
+module download: there is no need to download or install the library separately.
 
-This module has no special installation requirements. For general instruction on 
-how to install and update Drupal modules see 
+This module is designed to be "set it and forget it": it does not require any 
+special installation or configuration beyond enabling the module. It defaults to 
+setting a user's timezone automatically at login if their timezone is not yet 
+set.
+
+If desired, there are a couple of options that can be configured by visiting 
+admin/config/regional/timezone_detect .
+
+For general instruction on how to install and update Drupal modules see 
 <http://drupal.org/getting-started/install-contrib>.
-
 
 ================================================================================
  CONFIGURATION
