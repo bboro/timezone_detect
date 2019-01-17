@@ -1,0 +1,5 @@
+timezone_detect.admin:
+  title: 'Timezone detect'
+  description: 'Configure timezone detection settings.'
+  parent: system.admin_config_regional
+  route_name: timezone_detect.admin

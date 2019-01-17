@@ -1,0 +1,13 @@
+timezone_detect.admin:
+  path: 'admin/config/regional/timezone_detect'
+  defaults:
+    _form: 'Drupal\timezone_detect\Form\TimezoneDetectSettings'
+    _title: 'Timezone detect'
+  requirements:
+    _permission: 'administer site configuration'
+timezone_detect.update_timezone:
+  path: 'timezone-detect/ajax/set-timezone'
+  defaults:
+    _controller: 'Drupal\timezone_detect\Controller\SetTimezoneController::updateTimezone'
+  requirements:
+    _user_is_logged_in: 'TRUE'

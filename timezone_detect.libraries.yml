@@ -1,0 +1,11 @@
+jstz:
+  js:
+    jstz.js: {}
+
+init:
+  js:
+    timezone_detect.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - timezone_detect/jstz

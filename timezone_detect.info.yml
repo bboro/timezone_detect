@@ -1,0 +1,7 @@
+name: 'Timezone detect'
+description: 'Provides automatic timezone detection via javascript.'
+package: 'Date/Time'
+core: 8.x
+type: module
+
+configure: timezone_detect.admin

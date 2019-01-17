@@ -1,31 +1,35 @@
 /**
  * @file
  * Determine and set user's timezone on page load.
- * 
+ *
  * @todo: Use Drupal.behaviors?
  */
-jQuery(document).ready(function () {
+(function ($, Drupal, drupalSettings) {
 
-  // Determine timezone from browser client using jsTimezoneDetect library.
-  var tz = jstz.determine();
+  $(document).ready(function () {
 
-  if (tz.name() != Drupal.settings.timezone_detect.current_timezone) {
+    // Determine timezone from browser client using jsTimezoneDetect library.
+    var tz = jstz.determine();
 
-    // Post timezone to callback url via ajax.
-    jQuery.ajax({
-      type: 'POST',
-      url: Drupal.settings.basePath + 'timezone-detect/ajax/set-timezone',
-      dataType: 'json',
-      data: {
-        timezone: tz.name(), 
-        token: Drupal.settings.timezone_detect.token
-      }
-    });
+    if (tz.name() != drupalSettings.timezone_detect.current_timezone) {
 
-    // Set any timezone select on this page to the detected timezone.
-    jQuery('select[name="timezone"] > option[value="' + tz.name() + '"]')
-      .closest('select')
-      .val(tz.name());
-  }
+      // Post timezone to callback url via ajax.
+      $.ajax({
+        type: 'POST',
+        url: drupalSettings.path.baseUrl + 'timezone-detect/ajax/set-timezone',
+        dataType: 'json',
+        data: {
+          timezone: tz.name(),
+          token: drupalSettings.timezone_detect.token
+        }
+      });
 
-});
+      // Set any timezone select on this page to the detected timezone.
+      $('select[name="timezone"] option[value="' + tz.name() + '"]')
+        .closest('select')
+        .val(tz.name());
+    }
+
+  });
+
+})(jQuery, Drupal, drupalSettings);
