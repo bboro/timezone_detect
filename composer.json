@@ -1,0 +1,11 @@
+{
+    "name": "heydon/timezone_detect",
+    "description": "Provides automatic timezone detection via javascript.",
+    "type": "drupal-module",
+    "homepage": "http://drupal.org/project/timezone_detect",
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/timezone_detect"
+    },
+    "license": "GPL-2.0+",
+    "require": { }
+}
