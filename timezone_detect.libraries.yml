@@ -7,5 +7,7 @@ init:
     timezone_detect.js: {}
   dependencies:
     - core/jquery
+    - core/drupal
     - core/drupalSettings
     - timezone_detect/jstz
+    - core/jquery.ui.dialog
