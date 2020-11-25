@@ -4,20 +4,41 @@
  * Module provides automatic timezone detection via javascript.
  */
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\timezone_detect\TimezoneDetectInterface;
 use Drupal\user\UserInterface;
 
 /**
  * Implements hook_user_login().
  */
-function timezone_detect_user_login(UserInterface $account) {
+function timezone_detect_user_login(UserInterface $user) {
   $timezone_detect_settings = \Drupal::config('timezone_detect.settings');
-  if ($timezone_detect_settings->get('mode') === TimezoneDetectInterface::MODE_LOGIN || empty($account->timezone)) {
+  if ($timezone_detect_settings->get('mode') === TimezoneDetectInterface::MODE_LOGIN || empty($user->timezone)) {
     // Set session flag to update user's timezone. Note that we cannot add the
     // js directly from this function, as the user is redirected after this
     // hook fires.
     $_SESSION['timezone_detect']['update_timezone'] = TRUE;
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function timezone_detect_user_update(UserInterface $user) {
+  /** @var \Drupal\user\UserInterface $old_data */
+  $original = $user->original;
+  if ($original->getTimeZone() === $user->getTimeZone()) {
+    // No timezone update happened.
+    return;
+  }
+  if (\Drupal::currentUser()->id() === $user->id()) {
+
+  }
+  // Set a cookie to ignore automatic timezone detection. If the cookie exists
+  // then this will overwrite existing cookie and update the expiry time.
+  setcookie('timezone_detect_ignore', '1', strtotime('now + 3 months'), '/', \Drupal::request()->getHost(), TRUE);
+  // Unset the session variable to update timezone.
+  unset($_SESSION['timezone_detect']['update_timezone']);
 }
 
 /**

@@ -11,3 +11,9 @@ timezone_detect.update_timezone:
     _controller: 'Drupal\timezone_detect\Controller\SetTimezoneController::updateTimezone'
   requirements:
     _user_is_logged_in: 'TRUE'
+timezone_detect.set_cookie:
+  path: 'timezone-detect/ajax/set-cookie'
+  defaults:
+    _controller: 'Drupal\timezone_detect\Controller\SetTimezoneController::setCookie'
+  requirements:
+    _user_is_logged_in: 'TRUE'

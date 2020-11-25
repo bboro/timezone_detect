@@ -10,4 +10,5 @@ init:
     - core/drupal
     - core/drupalSettings
     - timezone_detect/jstz
-    - core/jquery.ui.dialog
+    - core/drupal.dialog.ajax
+    - core/js-cookie
